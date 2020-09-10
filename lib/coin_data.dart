@@ -1,5 +1,4 @@
 import 'package:bitcoin_ticker/networking.dart';
-import 'package:flutter/cupertino.dart';
 
 const List<String> currenciesList = [
   'AUD',
@@ -31,7 +30,7 @@ const List<String> cryptoList = [
   'LTC',
 ];
 
-const apiKey = 'YOUR API KEY HERE';
+const apiKey = 'Enter Your API Key Here';
 const coinAPIURL = 'https://rest.coinapi.io/v1/exchangerate';
 
 class CoinData {
