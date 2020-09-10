@@ -12,6 +12,9 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
+  String cryptoBTC = '0.0';
+  String cryptoETH = '0.0';
+  String cryptoLTC = '0.0';
 
   DropdownButton androidDropDown() {
     List<DropdownMenuItem<String>> dropDownItems = [];
@@ -29,6 +32,7 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (value) {
         setState(() {
           selectedCurrency = value;
+          getCurrencyConverted();
         });
       },
     );
@@ -58,10 +62,29 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getCurrencyConverted();
+  }
+
+  getCurrencyConverted() async {
+    var currencyData = await CoinData().getConversionRates(selectedCurrency);
+
+    setState(() {
+      cryptoBTC = currencyData[0].toStringAsFixed(2);
+      cryptoETH = currencyData[1].toStringAsFixed(2);
+      cryptoLTC = currencyData[2].toStringAsFixed(2);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('🤑 Coin Ticker'),
+        title: Center(
+          child: Text('🤑 Coin Ticker'),
+        ),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -69,33 +92,65 @@ class _PriceScreenState extends State<PriceScreen> {
         children: <Widget>[
           Padding(
             padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = ? USD',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
+            child: currencyCardWidget(
+                cryptoType: 'BTC',
+                cryptoValue: cryptoBTC,
+                selectedCurrency: selectedCurrency),
           ),
+          Padding(
+              padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+              child: currencyCardWidget(
+                  cryptoType: 'ETH',
+                  cryptoValue: cryptoETH,
+                  selectedCurrency: selectedCurrency)),
+          Padding(
+              padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+              child: currencyCardWidget(
+                  cryptoType: 'LTC',
+                  cryptoValue: cryptoLTC,
+                  selectedCurrency: selectedCurrency)),
           Container(
             height: 150.0,
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: iosPickerItem(),
+            child: whichOS(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class currencyCardWidget extends StatelessWidget {
+  const currencyCardWidget({
+    @required this.cryptoValue,
+    @required this.selectedCurrency,
+    @required this.cryptoType,
+  });
+
+  final String cryptoValue;
+  final String selectedCurrency;
+  final String cryptoType;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Colors.lightBlueAccent,
+      elevation: 5.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+        child: Text(
+          '1 $cryptoType = $cryptoValue $selectedCurrency',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 20.0,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }
